@@ -23,35 +23,16 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: Run build script
-      run: powershell -ExecutionPolicy Bypass -File ./build.ps1 -version ${{ github.event.release.tag_name }}
-
-    - name: Upload release ZIP asset
-      uses: actions/upload-release-asset@v1
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
       with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./Aimmy2/bin/Release/Release_${{ github.event.release.tag_name }}.zip
-        asset_name: ${{ github.event.release.tag_name }}.zip
-        asset_content_type: application/zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        dotnet-version: '8.0.x'
 
-    - name: Upload CUDA release ZIP asset
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./Aimmy2/bin/Release/Release_${{ github.event.release.tag_name }}_cuda.zip
-        asset_name: ${{ github.event.release.tag_name }}_cuda.zip
-        asset_content_type: application/zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Compile Aimmy
+      run: dotnet build Aimmy2/Aimmy2.csproj -c Release
 
-    - name: Upload Installer.exe asset
-      uses: actions/upload-release-asset@v1
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
       with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./Aimmy2/bin/Release/Installer.exe
-        asset_name: Installer.exe
-        asset_content_type: application/octet-stream
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        name: Aimmy-Latest-Build
+        path: Aimmy2/bin/Release/
